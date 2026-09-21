@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+from app.services.pack_engine import CATEGORIES, CATEGORY_NORMAL
 
 
 class RouteOut(BaseModel):
@@ -17,7 +19,19 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    category: str = CATEGORY_NORMAL
     model_config = {"from_attributes": True}
+
+
+class StopCategoryUpdate(BaseModel):
+    category: str
+
+    @field_validator("category")
+    @classmethod
+    def _check_category(cls, v: str) -> str:
+        if v not in CATEGORIES:
+            raise ValueError(f"品类必须是 {list(CATEGORIES)} 之一")
+        return v
 
 
 class BagItemOut(BaseModel):
@@ -25,6 +39,7 @@ class BagItemOut(BaseModel):
     stop_name: str
     weight_kg: float
     volume_l: float
+    category: str = CATEGORY_NORMAL
 
 
 class BagOut(BaseModel):
@@ -43,6 +58,7 @@ class RejectOut(BaseModel):
     stop_id: int
     stop_name: str
     reason: str
+    category: str = CATEGORY_NORMAL
     created_at: datetime
     model_config = {"from_attributes": True}
 

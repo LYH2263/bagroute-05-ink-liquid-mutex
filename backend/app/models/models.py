@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.services.pack_engine import CATEGORY_NORMAL
 
 
 class DeliveryRoute(Base):
@@ -23,6 +24,8 @@ class SubscriberStop(Base):
     name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    # 品类：normal 普通 / printed 印刷品 / liquid 液体
+    category: Mapped[str] = mapped_column(String(16), default=CATEGORY_NORMAL, server_default=CATEGORY_NORMAL)
     route: Mapped[DeliveryRoute] = relationship(back_populates="stops")
 
 
@@ -45,6 +48,7 @@ class BagItem(Base):
     stop_name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    category: Mapped[str] = mapped_column(String(16), default=CATEGORY_NORMAL, server_default=CATEGORY_NORMAL)
     bag: Mapped[PackBag] = relationship(back_populates="items")
 
 
@@ -55,4 +59,5 @@ class RejectRecord(Base):
     stop_id: Mapped[int] = mapped_column(Integer)
     stop_name: Mapped[str] = mapped_column(String(80))
     reason: Mapped[str] = mapped_column(String(200))
+    category: Mapped[str] = mapped_column(String(16), default=CATEGORY_NORMAL, server_default=CATEGORY_NORMAL)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

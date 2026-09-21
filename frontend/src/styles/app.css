@@ -250,3 +250,43 @@ button {
 }
 .fill { height: 10px; background: #2a3824; border-radius: 2px; overflow: hidden; }
 .fill > span { display: block; height: 100%; background: var(--accent); }
+
+/* —— 品类：普通 / 印刷 / 液体 —— */
+.hint { font-size: .78rem; color: var(--route-muted); }
+.cat-printed { color: #b9b3ff; }
+.cat-liquid { color: #9fd9f2; }
+
+.cat-tag {
+  display: inline-block;
+  font-size: .66rem;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 0 .4rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.cat-tag--normal { background: #24301f; color: var(--route-leaf); border: 1px solid #3a5030; }
+.cat-tag--printed { background: #34305a; color: #c4bdff; border: 1px solid #5b5fc7; }
+.cat-tag--liquid { background: #16364a; color: #9fd9f2; border: 1px solid #3a6a8a; }
+
+/* 站点页：品类色条 + 小下拉 */
+.stop-chip--printed { border-left-color: #8b8cf0; }
+.stop-chip--liquid { border-left-color: #7ec8e8; }
+.stop-chip .cat-tag { align-self: flex-start; margin-top: .1rem; }
+.cat-select { padding: .15rem .3rem; font-size: .72rem; margin-top: .15rem; }
+
+/* 装袋块按品类着色 */
+.bag-block { display: inline-flex; align-items: center; gap: .3rem; }
+.bag-block--printed { background: #5b5fc7; }
+.bag-block--liquid { background: #3a6a8a; }
+.bag-block .cat-tag--normal { background: rgba(0,0,0,.25); color: #f2ffe0; border-color: rgba(255,255,255,.35); }
+.bag-block .cat-tag--printed { background: rgba(0,0,0,.28); color: #e4e0ff; border-color: rgba(255,255,255,.35); }
+.bag-block .cat-tag--liquid { background: rgba(0,0,0,.28); color: #d6f0fb; border-color: rgba(255,255,255,.35); }
+
+/* 袋明细单元格 */
+.bag-items-cell { display: inline-flex; flex-wrap: wrap; gap: .25rem .4rem; align-items: center; }
+.bag-item-pill { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
+.pill-sep { color: var(--route-muted); font-size: .8rem; }
+
+.reject-title { margin: 1.2rem 0 .5rem; font-size: .95rem; color: var(--reject); }
