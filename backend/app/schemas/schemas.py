@@ -1,5 +1,9 @@
 from datetime import datetime
+from typing import Literal
+
 from pydantic import BaseModel
+
+Category = Literal["normal", "printed", "liquid"]
 
 
 class RouteOut(BaseModel):
@@ -17,7 +21,12 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    category: Category
     model_config = {"from_attributes": True}
+
+
+class StopUpdate(BaseModel):
+    category: Category
 
 
 class BagItemOut(BaseModel):
@@ -25,6 +34,7 @@ class BagItemOut(BaseModel):
     stop_name: str
     weight_kg: float
     volume_l: float
+    category: Category
 
 
 class BagOut(BaseModel):

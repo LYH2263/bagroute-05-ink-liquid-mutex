@@ -11,9 +11,10 @@ from app.schemas.schemas import (
     RejectOut,
     RouteOut,
     StopOut,
+    StopUpdate,
     WeightOut,
 )
-from app.services.pack_engine import StopItem, pack_route
+from app.services.pack_engine import CATEGORIES, StopItem, pack_route
 
 api_router = APIRouter()
 
@@ -36,6 +37,19 @@ def stops(route_id: int | None = None, db: Session = Depends(get_db)):
     return db.scalars(q).all()
 
 
+@api_router.patch("/stops/{stop_id}", response_model=StopOut)
+def update_stop(stop_id: int, body: StopUpdate, db: Session = Depends(get_db)):
+    stop = db.get(SubscriberStop, stop_id)
+    if not stop:
+        raise HTTPException(404, "订户点不存在")
+    if body.category not in CATEGORIES:
+        raise HTTPException(400, "品类只能是 normal / printed / liquid")
+    stop.category = body.category
+    db.commit()
+    db.refresh(stop)
+    return stop
+
+
 @api_router.post("/pack", response_model=list[BagOut])
 def pack(body: PackRequest, db: Session = Depends(get_db)):
     route = db.get(DeliveryRoute, body.route_id)
@@ -56,7 +70,8 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
         select(SubscriberStop).where(SubscriberStop.route_id == route.id).order_by(SubscriberStop.seq)
     ).all()
     items = [
-        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name) for s in stops
+        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name, s.category or "normal")
+        for s in stops
     ]
     result = pack_route(items, route.max_weight_kg, route.max_volume_l)
     out_bags: list[PackBag] = []
@@ -77,6 +92,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
                     stop_name=it.label,
                     weight_kg=it.weight_kg,
                     volume_l=it.volume_l,
+                    category=it.category,
                 )
             )
         out_bags.append(row)
@@ -103,6 +119,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
                     stop_name=i.stop_name,
                     weight_kg=i.weight_kg,
                     volume_l=i.volume_l,
+                    category=i.category or "normal",
                 )
                 for i in db.scalars(select(BagItem).where(BagItem.bag_id == b.id)).all()
             ],
@@ -130,6 +147,7 @@ def bags(db: Session = Depends(get_db)):
                         stop_name=i.stop_name,
                         weight_kg=i.weight_kg,
                         volume_l=i.volume_l,
+                        category=i.category or "normal",
                     )
                     for i in items
                 ],
@@ -139,8 +157,11 @@ def bags(db: Session = Depends(get_db)):
 
 
 @api_router.get("/rejects", response_model=list[RejectOut])
-def rejects(db: Session = Depends(get_db)):
-    return db.scalars(select(RejectRecord).order_by(RejectRecord.id.desc())).all()
+def rejects(route_id: int | None = None, db: Session = Depends(get_db)):
+    q = select(RejectRecord).order_by(RejectRecord.id.desc())
+    if route_id is not None:
+        q = q.where(RejectRecord.route_id == route_id)
+    return db.scalars(q).all()
 
 
 @api_router.get("/weights", response_model=list[WeightOut])

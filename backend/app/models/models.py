@@ -23,6 +23,8 @@ class SubscriberStop(Base):
     name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    # normal 普通 | printed 印刷品 | liquid 液体
+    category: Mapped[str] = mapped_column(String(16), default="normal")
     route: Mapped[DeliveryRoute] = relationship(back_populates="stops")
 
 
@@ -45,6 +47,7 @@ class BagItem(Base):
     stop_name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    category: Mapped[str] = mapped_column(String(16), default="normal")
     bag: Mapped[PackBag] = relationship(back_populates="items")
 
 
